@@ -29,10 +29,9 @@ jobs:
               --title "[Feat] ${{ github.ref_name }} → master" \
               --body "## Feat PR
               - **Branch:** \`${{ github.ref_name }}\`
-            - **Author:** ${{ github.actor }}
-            - **Commit:** ${{ github.sha }}" \
-
-            fixes #${ISSUE_NUMBER}" \
+              - **Author:** ${{ github.actor }}
+              - **Commit:** ${{ github.sha }}\
+              fixes #${ISSUE_NUMBER}" \
             --base master \
             --head ${{ github.ref_name }} \
             || echo "PR already exists, skipping"

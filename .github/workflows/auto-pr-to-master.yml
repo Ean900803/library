@@ -1,0 +1,44 @@
+name: Auto PR feature → master
+
+on:
+  push:
+    branches:
+      - "feat/**"
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Create PR to master via GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER=$(echo "${{ github.ref_name }}" | grep -oP '\d+' | tail -1)
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            PR_BODY="## Feat PR
+          - **Branch:** \`${{ github.ref_name }}\`
+          - **Author:** ${{ github.actor }}
+          - **Commit:** ${{ github.sha }}
+
+          fixes #${ISSUE_NUMBER}"
+          else
+            PR_BODY="## Feat PR
+          - **Branch:** \`${{ github.ref_name }}\`
+          - **Author:** ${{ github.actor }}
+          - **Commit:** ${{ github.sha }}"
+          fi
+
+          gh pr create \
+            --title "[Feat] ${{ github.ref_name }} → master" \
+            --body "$PR_BODY" \
+            --base master \
+            --head ${{ github.ref_name }} \
+            || echo "PR already exists, skipping"

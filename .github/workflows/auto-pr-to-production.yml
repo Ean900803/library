@@ -1,0 +1,35 @@
+name: Auto PR master → production
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  create-pr-to-production:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Create PR to production via GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "[Release] master → production" \
+            --body "## Release PR
+          - **Triggered by merged PR:** #${{ github.event.pull_request.number }}
+          - **Original branch:** \`${{ github.event.pull_request.head.ref }}\`
+          - **Merged by:** ${{ github.event.pull_request.merged_by.login }}
+          - **Commit:** ${{ github.sha }}" \
+            --base production \
+            --head master \
+            || echo "PR already exists, skipping"

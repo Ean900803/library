@@ -20,12 +20,22 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr create \
-            --title "[Feat] ${{ github.ref_name }} → master" \
-            --body "## Feat PR
-            - **Branch:** \`${{ github.ref_name }}\`
+          # 從 branch 名稱抓出 issue 編號
+          # feat/42-search → 42
+          ISSUE_NUMBER=$(echo "${{ github.ref_name }}" | grep -oP '\d+' | tail -1)
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh pr create \
+              --title "[Feat] ${{ github.ref_name }} → master" \
+              --body "## Feat PR
+              - **Branch:** \`${{ github.ref_name }}\`
             - **Author:** ${{ github.actor }}
             - **Commit:** ${{ github.sha }}" \
+
+            fixes #${ISSUE_NUMBER}" \
             --base master \
             --head ${{ github.ref_name }} \
             || echo "PR already exists, skipping"
+          else
+            echo "No issue number found in branch name, skipping PR creation"
+          fi

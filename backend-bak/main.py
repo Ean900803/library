@@ -6,7 +6,13 @@ from routers import health
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Library Management System")
+app = FastAPI(
+    title="Library Management System",
+    description="圖書管理系統 API",
+    version="0.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
 
 app.add_middleware(
     CORSMiddleware,

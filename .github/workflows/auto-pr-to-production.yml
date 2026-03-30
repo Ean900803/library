@@ -1,0 +1,35 @@
+name: Auto PR master → production
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed # 監聽 PR 被關閉的事件
+
+jobs:
+  create-pr-to-production:
+    # 確保是被 merge 而不是單純 close
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create PR to production
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "[Release] master → production"
+          body: |
+            ## Release PR
+            - **Triggered by merged PR:** #${{ github.event.pull_request.number }}
+            - **Original branch:** `${{ github.event.pull_request.head.ref }}`
+            - **Merged by:** ${{ github.event.pull_request.merged_by.login }}
+            - **Commit:** ${{ github.sha }}
+          base: production
+          draft: false

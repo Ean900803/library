@@ -1,0 +1,30 @@
+name: Auto PR feature → master
+
+on:
+  push:
+    branches:
+      - "feature/**"
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create PR to master
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "[Feature] ${{ github.ref_name }} → master"
+          body: |
+            ## Feature PR
+            - **Branch:** `${{ github.ref_name }}`
+            - **Author:** ${{ github.actor }}
+            - **Commit:** ${{ github.sha }}
+          base: master
+          draft: false

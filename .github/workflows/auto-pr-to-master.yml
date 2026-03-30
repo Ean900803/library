@@ -3,7 +3,7 @@ name: Auto PR feature → master
 on:
   push:
     branches:
-      - "feature/**"
+      - "feat/**"
 
 jobs:
   create-pr:
@@ -21,8 +21,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create \
-            --title "[Feature] ${{ github.ref_name }} → master" \
-            --body "## Feature PR
+            --title "[Feat] ${{ github.ref_name }} → master" \
+            --body "## Feat PR
             - **Branch:** \`${{ github.ref_name }}\`
             - **Author:** ${{ github.actor }}
             - **Commit:** ${{ github.sha }}" \

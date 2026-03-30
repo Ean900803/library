@@ -3,7 +3,7 @@ name: Auto PR feature → master
 on:
   push:
     branches:
-      - "feat/**"
+      - "feature/**"
 
 jobs:
   create-pr:
@@ -14,17 +14,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Create PR to master
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "[feat] ${{ github.ref_name }} → master"
-          body: |
-            ## Feature PR
-            - **Branch:** `${{ github.ref_name }}`
+      - name: Create PR to master via GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "[Feature] ${{ github.ref_name }} → master" \
+            --body "## Feature PR
+            - **Branch:** \`${{ github.ref_name }}\`
             - **Author:** ${{ github.actor }}
-            - **Commit:** ${{ github.sha }}
-          base: master
-          draft: false
+            - **Commit:** ${{ github.sha }}" \
+            --base master \
+            --head ${{ github.ref_name }} \
+            || echo "PR already exists, skipping"
